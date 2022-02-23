@@ -1,45 +1,57 @@
-/* DigiByte Networks Params for Bitcore-lib */
+/* DigiByte Networks Params */
 
 const livenet = {
-  name: 'dgb_livenet',
-  alias: 'dgb_mainnet',
-  bech32prefix: 'dgb',
-  pubkeyhash: 0x1e,
-  privatekey: 0x80,
-  privatekeyOld: 0x9e,
-  scripthash: 0x3f,
-  scripthashTwo: 0x05,
-  xpubkey: 0x0488b21e,
-  xprivkey: 0x0488ade4,
-  networkMagic: 0xfac3b6da,
-  port: 12024,
-  dnsSeeds: [
-    'seed.digibyte.co',
-    'seed.digibyte.io',
-    'digiexplorer.info',
-  ],
+  messagePrefix: '\x18Digibyte Mainnet Signed Message:\n',
+  bech32: 'dgb',
+  bip32: {
+    public: 0x0488b21e,
+    private: 0x0488ade4,
+  },
+  pubKeyHash: 0x1e,
+  scriptHash: 0x3f,
+  wif: 0x80,
+
+  // name: 'dgb_livenet',
+  // alias: 'dgb_mainnet',
+  // bech32prefix: 'dgb',
+  // pubkeyhash: 0x1e,
+  // privatekey: 0x80,
+  // privatekeyOld: 0x9e,
+  // scripthash: 0x3f,
+  // scripthashTwo: 0x05,
+  // xpubkey: 0x0488b21e,
+  // xprivkey: 0x0488ade4,
+  // networkMagic: 0xfac3b6da,
+  // port: 12024,
+  // dnsSeeds: [
+  //   'seed.digibyte.co',
+  //   'seed.digibyte.io',
+  //   'digiexplorer.info',
+  // ],
 };
 
 const testnet = {
-  name: 'dgb_testnet',
-  alias: 'dgb_testnet',
-  bech32prefix: 'dgbt',
-  pubkeyhash: 0x7e,
-  privatekey: 0xfe,
-  scripthash: 0x8c,
-  xpubkey: 0x043587cf,
-  xprivkey: 0x04358394,
+  messagePrefix: '\x18Digibyte Testnet Signed Message:\n',
+  bech32: 'dgbt',
+  bip32: {
+    public: 0x043587cf,
+    private: 0x04358394,
+  },
+  pubKeyHash: 0x7e,
+  scriptHash: 0x8c,
+  wif: 0xfe,
 };
 
 const regtest = {
-  name: 'dgb_regtest',
-  alias: 'dgb_regtest',
-  bech32prefix: 'dgbrt',
-  pubkeyhash: 0x7e,
-  privatekey: 0xfe,
-  scripthash: 0x8c,
-  xpubkey: 0x043587cf,
-  xprivkey: 0x04358394,
+  messagePrefix: '\x18Digibyte Regtest Signed Message:\n',
+  bech32: 'dgbrt',
+  bip32: {
+    public: 0x043587cf,
+    private: 0x04358394,
+  },
+  pubKeyHash: 0x7e,
+  scriptHash: 0x8c,
+  wif: 0xfe,
 };
 
 module.exports = {

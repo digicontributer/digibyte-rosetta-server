@@ -40,8 +40,7 @@ const mempool = async (params) => {
   // eslint-disable-next-line no-unused-vars
   const { mempoolRequest } = params;
 
-  const mempoolResponse = await rpc.getRawMemPoolAsync(true);
-  const mempool = mempoolResponse.result;
+  const mempool = await rpc.getrawmempool({ verbose: true });
 
   if (!mempool) {
     throw Errors.UNABLE_TO_FETCH_MEMPOOL_TXS;
@@ -62,10 +61,9 @@ const mempoolTransaction = async (params) => {
   const { mempoolTransactionRequest } = params;
 
   const txId = mempoolTransactionRequest.transaction_identifier.hash;
-  const mempoolTransactionResponse = await rpc.getRawTransactionAsync(txId, 1);
-  const mempoolTx = mempoolTransactionResponse.result;
+  const mempoolTx = await rpc.getrawtransaction({ txid: txId });
 
-  if (!mempool) {
+  if (!mempoolTx) {
     throw Errors.UNABLE_TO_FETCH_MEMPOOL_TX;
   }
 

@@ -30,6 +30,7 @@ const Errors = require('../../config/errors');
 
 const SyncBlockCache = require('../syncBlockCache');
 const DigiByteIndexer = require('../digibyteIndexer');
+const DigiByteSyncer = require('../digibyteSyncer');
 
 /* Data API: Block */
 
@@ -44,7 +45,7 @@ const block = async (params, req) => {
   const { blockRequest } = params;
 
   let blockData;
-  let parentBlock;  
+  let parentBlock;
   let transactions;
 
   /**
@@ -53,19 +54,16 @@ const block = async (params, req) => {
    */
   if (blockRequest.block_identifier.index != null && !blockRequest.block_identifier.hash) {
     SyncBlockCache.get('')
-    const hashResponse = await rpc.getBlockHashAsync(blockRequest.block_identifier.index);
-    blockRequest.block_identifier.hash = hashResponse.result;
+    blockRequest.block_identifier.hash = await rpc.getblockhash({ height: blockRequest.block_identifier.index});
   }
 
   /**
    * Get the block data using rpc call, unless it was found in a local block cache.
-   * Return COULD_NOT_FETCH_BLOCK (retriable) if for some reason the request failed. 
+   * Return COULD_NOT_FETCH_BLOCK (retriable) if for some reason the request failed.
    */
   blockData = SyncBlockCache.get(blockRequest.block_identifier.hash);
   if (blockData == null) {
-    const blockResponse = await rpc.getBlockAsync(blockRequest.block_identifier.hash, 2);
-
-    blockData = blockResponse.result;
+    blockData = await rpc.getblock({blockhash: blockRequest.block_identifier.hash, verbosity: 2});
     if (!blockData) {
       throw Errors.COULD_NOT_FETCH_BLOCK;
     }
@@ -77,7 +75,7 @@ const block = async (params, req) => {
     SyncBlockCache.put(
       blockData.hash,
       blockData,
-    );    
+    );
   }
 
   /**
@@ -85,7 +83,7 @@ const block = async (params, req) => {
    * utxo indexer.
    */
   const isSyncerRequest = req.headers['syncer-secret'] == Config.syncer.syncerSecret;
-  const requestedDataAvailable = DigiByteIndexer.safeLastBlockSymbol >= blockData.height;  
+  const requestedDataAvailable = DigiByteIndexer.safeLastBlockSymbol >= blockData.height;
 
   /**
    * Create a Full Block Identifier according to the Rosetta spec.
@@ -115,19 +113,28 @@ const block = async (params, req) => {
     /**
      * Process transaction operations if the requested data
      * was already indexed by the utxo syncer.
-     */    
+     */
     transactions = await Promise.all(
       blockData.tx.map((tx) => utils.transactionToRosettaType(tx))
     );
 
   } else if (!isSyncerRequest) {
-    /**
-     * Exit if the utxo syncer hasn't indexed the requested block height.
-     * This error won't be thrown if the request was made by the syncer.
-     */
-    throw Errors.NODE_SYNCING.addDetails({
-      syncedTo: DigiByteIndexer.safeLastBlockSymbol,
-    });
+    await DigiByteSyncer.sync(blockRequest.block_identifier.index, blockRequest.block_identifier.index);
+    await DigiByteIndexer.saveState();
+    const requestedDataAvailable = DigiByteIndexer.safeLastBlockSymbol >= blockData.height;
+    if (requestedDataAvailable) {
+      transactions = await Promise.all(
+        blockData.tx.map((tx) => utils.transactionToRosettaType(tx))
+      );
+    } else {
+      /**
+       * Exit if the utxo syncer hasn't indexed the requested block height.
+       * This error won't be thrown if the request was made by the syncer.
+       */
+      throw Errors.NODE_SYNCING.addDetails({
+        syncedTo: DigiByteIndexer.safeLastBlockSymbol,
+      });
+    }
   }
 
   /**

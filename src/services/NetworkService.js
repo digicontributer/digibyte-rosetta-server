@@ -37,7 +37,7 @@ const Errors = require('../../config/errors');
 * returns NetworkListResponse
 * */
 const networkList = async (params) => {
-  // eslint-disable-next-line no-unused-vars  
+  // eslint-disable-next-line no-unused-vars
   const { metadataRequest } = params;
 
   const response = new Types.NetworkListResponse(
@@ -55,7 +55,7 @@ const networkList = async (params) => {
 * returns NetworkOptionsResponse
 * */
 const networkOptions = async (params) => {
-  // eslint-disable-next-line no-unused-vars  
+  // eslint-disable-next-line no-unused-vars
   const { networkRequest } = params;
 
   const version = new Types.Version(
@@ -81,7 +81,7 @@ const networkOptions = async (params) => {
 * returns NetworkStatusResponse
 * */
 const networkStatus = async (params) => {
-  // eslint-disable-next-line no-unused-vars  
+  // eslint-disable-next-line no-unused-vars
   const { networkRequest } = params;
 
   let currentBlockIdentifier;
@@ -90,23 +90,23 @@ const networkStatus = async (params) => {
   let peers;
 
   try {
-    const info = await rpc.getBlockchainInfoAsync();
+    const info = await rpc.getblockchaininfo();
     currentBlockIdentifier = new Types.BlockIdentifier(
-      info.result.blocks, // height
-      info.result.bestblockhash, // hash
+      info.blocks, // height
+      info.bestblockhash, // hash
     );
 
-    const bestBlock = await rpc.getBlockAsync(currentBlockIdentifier.hash, 1);
-    currentBlockTimestamp = bestBlock.result.time * 1000; // milliseconds
+    const bestBlock = await rpc.getblock({ blockhash: currentBlockIdentifier.hash, verbosity: 1 });
+    currentBlockTimestamp = bestBlock.time * 1000; // milliseconds
 
-    const genesisBlock = await rpc.getBlockHashAsync(0);
+    const genesisBlock = await rpc.getblockhash({ height: 0 });
     genesisBlockIdentifier = new Types.BlockIdentifier(
       0, // index: 0
-      genesisBlock.result, // hash
+      genesisBlock, // hash
     );
 
-    const peersData = await rpc.getPeerInfoAsync();
-    peers = peersData.result.map((p) => Types.Peer.constructFromObject({
+    const peersData = await rpc.getpeerinfo();
+    peers = peersData.map((p) => Types.Peer.constructFromObject({
       peer_id: p.id,
       metadata: {
         addr: p.addr,

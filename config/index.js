@@ -7,14 +7,14 @@ const DEFAULT_ROSETTA_VERSION = '1.3.1';
 const DEFAULT_RPC_PORT = 14022;
 const DEFAULT_RPC_USER = 'user';
 const DEFAULT_RPC_PASS = 'pass';
-const DEFAULT_RPC_HOST = 'localhost';
+const DEFAULT_RPC_HOST = '127.0.0.1';
 const DEFAULT_RPC_PROTO = 'http';
 const DEFAULT_LISTENING_PORT = 8080;
 const DEFAULT_DATA_PATH = './data';
 const DEFAULT_DGB_NETWORK = 'livenet';
-  
+
 /**
- * syncerSecret is used by the Indexer in order to request blocks from 
+ * syncerSecret is used by the Indexer in order to request blocks from
  * the listening server, that are not yet synced.
  * If the secret is not set in a request, the /block endpoint will
  * return an error (NODE_SYNCING).

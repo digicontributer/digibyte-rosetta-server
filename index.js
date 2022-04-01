@@ -96,8 +96,7 @@ const startSyncer = async () => {
 
 const continueSyncIfNeeded = async () => {
   const currentHeight = DigiByteIndexer.lastBlockSymbol;
-  const blockCountResponse = await rpc.getBlockCountAsync();
-  const blockCount = blockCountResponse.result;
+  const blockCount = await rpc.getblockcount();
 
   if (currentHeight >= blockCount) {
     // If the sync block height equals the best block height,
@@ -134,8 +133,8 @@ const checkConnection = async () => {
 
   for (;;) {
     try {
-      const response = await rpc.getBlockCountAsync();
-      if (response.result == 0) throw new Error('Block height is zero');
+      const response = await rpc.getblockcount();
+      if (response == 0) throw new Error('Block height is zero');
       break;
     } catch (e) {
       await wait(30000);

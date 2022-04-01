@@ -19,7 +19,7 @@ services:
   digibyte_offline:
     build:
       dockerfile: Dockerfile
-      context: ..      
+      context: ..
       args:
         - use_regtest=1
         - rootdatadir=/data
@@ -45,7 +45,7 @@ services:
   digibyte_online:
     build:
       dockerfile: Dockerfile
-      context: ..      
+      context: ..
       args:
         - use_regtest=1
         - rootdatadir=/data
@@ -76,13 +76,16 @@ services:
   rosetta_cli:
     build:
       dockerfile: ./test/rosetta-cli/Dockerfile
-      context: ..      
-      args: 
-        - version_tag=4bb48b24a794deb3635973e32d1ea806e5b30729
+      context: ..
+      args:
+        - version_tag=v0.7.3
+
+    volumes:
+      - ./container_results:/data/results
 
     environment:
       - OFFLINE_HOST=digibyte_offline
-      - ONLINE_HOST=digibyte_online        
+      - ONLINE_HOST=digibyte_online
       - OFFLINE_PORT=1337
       - ONLINE_PORT=1338
 
@@ -91,21 +94,3 @@ services:
 
     depends_on:
       - digibyte_online
-
-  # # NodeJS Test Runner
-  # test_runner:
-  #   build: 
-  #     dockerfile: ./test/test-runner/Dockerfile
-  #     context: ..
-
-  #   environment:
-  #     - OFFLINE_HOST=digibyte_offline
-  #     - ONLINE_HOST=digibyte_online        
-  #     - OFFLINE_PORT=1337
-  #     - ONLINE_PORT=1338
-
-  #   networks:
-  #     - test
-
-  #   depends_on:
-  #     - digibyte_online      

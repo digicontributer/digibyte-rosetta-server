@@ -2,7 +2,7 @@ FROM ubuntu:focal
 USER root
 WORKDIR /data
 
-ARG dgb_version=7.17.2
+ARG dgb_version=v7.17.3
 ARG arch=x86_64
 
 # You can confirm your timezone by setting the TZ database name field from:
@@ -16,7 +16,9 @@ RUN DEBIAN_FRONTEND="noninteractive" apt-get update \
   && ln -fs /usr/share/zoneinfo/${local_timezone} /etc/localtime \
   && dpkg-reconfigure --frontend noninteractive tzdata \
   && apt-get install -y wget git build-essential libtool autotools-dev automake \
-  && apt-get install -y nodejs npm \
+  && apt-get install -y curl  \
+  && curl -sL https://deb.nodesource.com/setup_14.x | bash -  \
+  && apt-get install -y nodejs \
   pkg-config libssl-dev libevent-dev bsdmainutils python3 libboost-system-dev \
   libboost-filesystem-dev libboost-chrono-dev libboost-test-dev libboost-thread-dev \
   libdb-dev libdb++-dev && \
@@ -59,7 +61,7 @@ COPY package.json package-lock.json /tmp/npm_install/
 RUN cd /tmp/npm_install && \
   npm set progress=false && \
   npm config set depth 0 && \
-  npm install 
+  npm install
 RUN cp -a /tmp/npm_install/node_modules "/root/rosetta-node/"
 
 # Copy the source to rosetta node directory
@@ -90,7 +92,7 @@ ARG prunesize=0
 RUN bash -c 'echo -e "\
 server=1\n\
 prune=${prunesize}\n\
-maxconnections=300\n\
+maxconnections=865\n\
 rpcallowip=127.0.0.1\n\
 daemon=1\n\
 rpcuser=${rpc_username}\n\
@@ -100,7 +102,7 @@ txindex=0\n\
 disabledandelion=1\n\
 addresstype=bech32\n\
 testnet=${use_testnet}\n\
-rpcworkqueue=32\n\
+rpcworkqueue=100\n\
 regtest=${use_regtest}\n\
 [regtest]\n\
 rpcbind=127.0.0.1\n\
@@ -137,7 +139,7 @@ RUN if [ "$use_testnet" = "0" ] && [ "$use_regtest" = "0" ]; \
     fi
 
 # Allow Communications:
-#         p2p mainnet   rpc mainnet   p2p testnet   rpc testnet    p2p regtest    rpc regtest 
+#         p2p mainnet   rpc mainnet   p2p testnet   rpc testnet    p2p regtest    rpc regtest
 EXPOSE    12024/tcp     14022/tcp     12026/tcp     14023/tcp      18444/tcp      18443/tcp
 
 #         Rosetta HTTP Node

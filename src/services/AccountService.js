@@ -73,7 +73,7 @@ const balance = async (params) => {
     // If the hash was not yet set, get the block hash using rpc.
     if (!blockIdentifier.hash) {
       console.log('Retrieving the block hash for symbol', accountData);
-      blockIdentifier.hash = await rpc.getBlockHashAsync(accountData.blockSymbol);
+      blockIdentifier.hash = await rpc.getblockhash({ height: accountData.blockSymbol });
     }
 
     // Create the balances array
@@ -89,7 +89,7 @@ const balance = async (params) => {
       blockIdentifier,
       balances,
     );
-    
+
   } catch (e) {
     return Errors.UNABLE_TO_RETRIEVE_BALANCE.addDetails({
       message: e.message,

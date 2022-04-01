@@ -75,8 +75,6 @@ const txOperations = async (tx, isMempoolTx = false) => {
     const address = output.scriptPubKey.addresses[0];
     const nextOperationId = operationId++;
 
-    let trig = false;
-
     ret.push(Types.Operation.constructFromObject({
       operation_identifier: new Types.OperationIdentifier(nextOperationId),
       type: OperationTypes.TRANSFER,

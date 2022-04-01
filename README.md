@@ -65,8 +65,8 @@ By using the `Syncer` class of the Rosetta SDK, the sync has become exceptionall
 Note, that the addition of an UTXO database is heavily discussed in the official Bitcoin Mailgroup. As soon as this feature is added, many altcoins will probably apply the changes too, and the above UTXO middleware will most likely become obsolete.
 
 ## ToDos
-- [ ] Implement Construction API for Offline and Online Environments
+- [x] Implement Construction API for Offline and Online Environments
 - [x] Test the node using coinbase's [rosetta-cli](https://github.com/coinbase/rosetta-cli.git) ([Results](docs/LivenetValidationResults.md))
 - [x] Run the mainnet node and wait for full sync
 - [x] Test some utxo balance checks ([Results](docs/Validation.md))
-- [ ] Setup Continious Integration
+- [ ] Setup Continuous Integration

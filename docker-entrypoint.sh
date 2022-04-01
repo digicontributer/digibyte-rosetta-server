@@ -45,15 +45,19 @@ simulate_mining() {
     # Generate three addresses
     dgb_address1=`$node1 getnewaddress "" bech32`
     dgb_address2=`$node1 getnewaddress "" bech32`
-    dgb_address3=`$node1 getnewaddress "" bech32`
     private_key1=`$node1 dumpprivkey "$dgb_address1"`
     private_key2=`$node1 dumpprivkey "$dgb_address2"`
-    private_key3=`$node1 dumpprivkey "$dgb_address3"`    
 
     echo "PUBLIC_ADDRESS_1:  $dgb_address1"
     echo "PUBLIC_ADDRESS_2:  $dgb_address2"
     echo "PRIVATE_KEY_1:     $private_key1"
     echo "PRIVATE_KEY_2:     $private_key2"
+
+    dgb_address_test1="siT2SP53qqdFJP8nGCzj9jV8fv2wD6u3y2"
+    private_key_test1="9Y1S3m5wqzGLCaMKq83P2Vwhm1YXjqjFThbWXVxBi9GMwBWfL4N"
+    $node1 importprivkey "$private_key_test1" "test_wallet1" true
+    addressInfo=`$node1 getaddressinfo "$dgb_address_test1"`
+    echo "TEST INFO:     $addressInfo"
 
     # Generate 101 blocks
     hashes=`$node1 generatetoaddress 101 $dgb_address1`
@@ -66,21 +70,23 @@ simulate_mining() {
     # Change to false in order to reproduce the
     # bug mentioned in `Bug.md`.
     USE_SAFE_GENERATE=true
-    if $USE_SAFE_GENERATE; then 
+    if $USE_SAFE_GENERATE; then
         # Generate one more block
         $node1 generate 1
-        
+
         # Send More than 72000 to a third address.
         # This transaction requires a utxo from dgb_address2
-        txid=`$node1 sendtoaddress $dgb_address3 $(($spendable + 10000))`
-        $node1 generate 1 
+        txid=`$node1 sendtoaddress $dgb_address_test1 $(($spendable + 10000))`
+        $node1 generate 1
     else
         hash=`$node1 generatetoaddress 1 "$dgb_address1" | tr -d '["] '`
         $node1 getblock $hash 2
 
-        txid=`$node1 sendtoaddress $dgb_address3 $(($spendable + 10000))`
+        txid=`$node1 sendtoaddress $dgb_address_test1 $(($spendable + 10000))`
         hash=`$node1 generatetoaddress 1 "$dgb_address1" | tr -d '["] '`
     fi
+
+    while true; do $node1 generate 1; sleep 15; done &
 }
 
 if [ ! -d "$DATA_DIR" ]; then
@@ -94,7 +100,7 @@ cat "${DATA_DIR}/digibyte.conf"
 echo "Starting digibyted..."
 digibyted \
     -conf="${DATA_DIR}/digibyte.conf" \
-    -datadir="${DATA_DIR}/.digibyte" 
+    -datadir="${DATA_DIR}/.digibyte"
 
 sleep 2
 
